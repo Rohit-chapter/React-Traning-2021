@@ -1,7 +1,7 @@
 import React from 'react';
-import axios from 'axios';
-
+import { connect } from "react-redux";
 import BlogComponents from '../../Components/blog'
+import {blogRequest} from "../../Redux/Action"
 
 class Blog extends React.Component {
     constructor(props) {
@@ -11,31 +11,43 @@ class Blog extends React.Component {
         };
     }
     componentDidMount() {
-      axios.get(`https://jsonplaceholder.typicode.com/photos?albumId=1`)
-        .then(res => {
-          const photos = res.data;
-          this.setState({ photos });
-        })
+      this.getBlogImages();
     }
 
-    handleDetail =()=>{
-
+    getBlogImages = async()=>{
+      try {
+        this.props.blogRequest()
+      }
+      catch(error){
+        console.log(error,"error");
+      }
     }
 
     render() {
-        const {slidename} = this.state
+        const {blogData} = this.props
+        console.log(blogData,"blogData")
       return (
           <>
-          {/* <ul>
-            { this.state.photos.map((photos,index) => <li>{person.name}</li>)}
-          </ul> */}
-            <BlogComponents 
-              blogData={this.state.photos}
-            />
+            <BlogComponents {...this.props}/>
           </>
       );
     }
 }
 
-export default Blog;
+
+const mapStateToProps = state => ({
+  blogData:state.blogInfoReducer.blogInfo
+});
+const mapDispatchToProps = dispatch => ({
+  blogRequest: data => {
+    dispatch(blogRequest(data));
+  },
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Blog);
+
+
   

@@ -2,8 +2,8 @@
  * ErrorHandlerHelper Class - For managing errors
  */
 export class ErrorHandlerHelper {
-	public rawError: any;
-	public error: { [key: string]: any } = {
+	rawError;
+	error = {
 		code: 500,
 		isError: true,
 		timestamp: Date.now(),
@@ -12,29 +12,30 @@ export class ErrorHandlerHelper {
 		data: undefined,
 	};
 
-	constructor(err: { [key: string]: any }) {
+	constructor(err) {
 		this.rawError = err;
 		this.setError();
 	}
 
-	public setError = (): void => {
-		this.error.code = this.rawError.status
-			? this.rawError.status
-			: this.error.status;
+	setError = () => {
+        const code = 
+		this.rawError && this.rawError.code
+			? this.rawError.code
+            : this.error.code;
+        this.error.code = code ? code :400;            
 		this.error.timestamp = Date.now();
 		this.error.messages = [];
-		if (this.rawError.data && typeof this.rawError.data === 'object') {
-			if (this.rawError.data.hasOwnProperty('error')) {
-				this.error.messages = this.rawError.data.error.message;
-			}
-
-			if (this.rawError.data) {
-				this.error.messages = this.rawError.data.message;
-			}
+		if (this.rawError.data && typeof this.rawError.data === 'object' && this.rawError.data.message) {
+			if ((this.rawError && this.rawError.data.message === "Token has expired") || (this.rawError && this.rawError.data.message === "Unauthorized, Invalid token!")){
+                localStorage.removeItem("token");
+                window.location.href = "/";
+			}else{
+                this.error.messages.push(this.rawError.data.error.message);
+            }
 		}
 		if (!this.error.messages.length) {
 			this.error.error = 'Unknown';
-			this.error.messages = 'Unknown error occure';
+			this.error.messages = [null];
 		}
 	};
 }

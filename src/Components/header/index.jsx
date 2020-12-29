@@ -1,6 +1,16 @@
+import React from 'react';
 import { Link } from "react-router-dom";
 
-function Header() {
+
+
+class Header extends React.Component {
+  logOut =()=>{
+    localStorage.removeItem("token");
+    this.props.history.push("/login");
+  }
+  
+  render(){
+  const {token} = this.props;
   return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
          <div className="container-fluid">
@@ -17,10 +27,18 @@ function Header() {
                   <Link className="nav-link active" to="/contact-us">Contact Us</Link>
                 </li>
               </ul>
+
+              <ul className={"nav ml-auto"}>
+                <li className="nav-item ml-auto">
+                  {!token ? <Link className="nav-link active" to="/login">Login</Link>  : <span className="nav-link cursor-pointer" onClick={()=>this.logOut()}>Logout</span> 
+                  }
+                </li>
+              </ul>
             </div>
           </div>
       </nav>
   );
+  }
 }
 
 export default Header;
